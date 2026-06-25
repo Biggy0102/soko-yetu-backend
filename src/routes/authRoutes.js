@@ -1,0 +1,13 @@
+// Routes for register.html, login.html, and "who am I" checks (e.g. for the
+// header's account panel to know whether to show "Sign in" or the user's name).
+
+const express = require("express");
+const router = express.Router();
+const { register, login, getMe } = require("../controllers/authController");
+const { requireAuth } = require("../middleware/auth");
+
+router.post("/register", register);
+router.post("/login", login);
+router.get("/me", requireAuth, getMe);
+
+module.exports = router;
