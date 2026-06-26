@@ -4,16 +4,29 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
+const path = require("path");
 
 const authRoutes = require("./routes/authRoutes");
 const listingRoutes = require("./routes/listingRoutes");
 const referenceRoutes = require("./routes/referenceRoutes");
+const uploadRoutes = require("./routes/uploadRoutes");
 
 const app = express();
 
-app.use(helmet());
+app.use(
+  helmet({
+    // Default helmet blocks other origins from loading images/files from this
+    // server - since the frontend lives on a different domain (Netlify) than
+    // this API (Render), that default would silently break every listing photo.
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+  })
+);
 app.use(cors()); // tighten this to your real frontend's origin before going to production
 app.use(express.json());
+
+// Serves uploaded photos as plain static files, e.g.
+// https://soko-yetu-backend.onrender.com/uploads/abc123.jpg
+app.use("/uploads", express.static(path.join(__dirname, "..", "uploads")));
 
 app.get("/api/health", (req, res) => {
   res.json({ status: "ok" });
@@ -22,6 +35,7 @@ app.get("/api/health", (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/listings", listingRoutes);
 app.use("/api", referenceRoutes); // exposes /api/categories and /api/countries
+app.use("/api/upload", uploadRoutes);
 
 // Catch-all error handler - keeps unexpected errors from leaking stack traces
 // to the client while still logging them for us to debug.
