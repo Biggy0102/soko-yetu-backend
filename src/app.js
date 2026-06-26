@@ -6,6 +6,8 @@ const cors = require("cors");
 const helmet = require("helmet");
 
 const authRoutes = require("./routes/authRoutes");
+const listingRoutes = require("./routes/listingRoutes");
+const referenceRoutes = require("./routes/referenceRoutes");
 
 const app = express();
 
@@ -18,6 +20,8 @@ app.get("/api/health", (req, res) => {
 });
 
 app.use("/api/auth", authRoutes);
+app.use("/api/listings", listingRoutes);
+app.use("/api", referenceRoutes); // exposes /api/categories and /api/countries
 
 // Catch-all error handler - keeps unexpected errors from leaking stack traces
 // to the client while still logging them for us to debug.
