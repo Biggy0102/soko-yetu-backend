@@ -1,62 +1,9 @@
-// Implements the real version of what js/browse.js, js/listing.js, js/post-ad.js,
+﻿// Implements the real version of what js/browse.js, js/listing.js, js/post-ad.js,
 // and js/dashboard.js currently fake using the hardcoded LISTINGS array and
 // sessionStorage. These endpoints read/write real listings in the database.
 
 const prisma = require("../prisma/client");
-
-// ===== HELPERS =====
-
-// Strips internal fields and reshapes a listing the way the frontend expects -
-// e.g. listing.js calls getSellerProfile(listing.sellerName) and reads listing.icon,
-// so we surface the seller's public info and the category icon directly on the listing.
-function toPublicListing(listing) {
-  return {
-    id: listing.id,
-    title: listing.title,
-    price: listing.price,
-    negotiable: listing.negotiable,
-    currency: listing.currency,
-    description: listing.description,
-    category: listing.categoryId,
-    categoryName: listing.category?.name,
-    icon: listing.category?.icon,
-    sub: listing.subcategoryId,
-    subName: listing.subcategory?.name,
-    country: listing.countryCode,
-    countryName: listing.country?.name,
-    city: listing.city,
-    location: `${listing.city}, ${listing.country?.name || ""}`,
-    storeAddress: listing.storeAddress,
-    specs: listing.specs,
-    photos: (listing.photos || [])
-      .sort((a, b) => a.position - b.position)
-      .map((p) => p.url),
-    sellerId: listing.sellerId,
-    sellerName: listing.seller?.name,
-    sellerPhone: listing.seller?.phone,
-    seller: listing.seller
-      ? {
-          name: listing.seller.name,
-          verified: listing.seller.verified,
-          memberSince: listing.seller.memberSince,
-          responseTime: listing.seller.responseTime,
-        }
-      : undefined,
-    status: listing.status,
-    featured: listing.featured,
-    views: listing.views,
-    postedAt: listing.createdAt,
-  };
-}
-
-// Fields always included when fetching a listing, so toPublicListing() has what it needs
-const LISTING_INCLUDE = {
-  category: true,
-  subcategory: true,
-  country: true,
-  seller: true,
-  photos: true,
-};
+const { LISTING_INCLUDE, toPublicListing } = require("../utils/listingFormatter");
 
 // ===== GET /api/listings - browse/search with filters =====
 // Mirrors getFilteredListings() in browse.js: category, sub, country, q, min, max, sort.

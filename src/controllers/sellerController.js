@@ -3,46 +3,7 @@
 // seller's actual account + their active listings + real feedback from the database.
 
 const prisma = require("../prisma/client");
-
-// Same shape listingController.js's LISTING_INCLUDE uses, so a seller's listings
-// here look identical to ones returned from /api/listings.
-const LISTING_INCLUDE = {
-  category: true,
-  subcategory: true,
-  country: true,
-  seller: true,
-  photos: true,
-};
-
-function toPublicListing(listing) {
-  return {
-    id: listing.id,
-    title: listing.title,
-    price: listing.price,
-    negotiable: listing.negotiable,
-    currency: listing.currency,
-    description: listing.description,
-    category: listing.categoryId,
-    categoryName: listing.category?.name,
-    icon: listing.category?.icon,
-    sub: listing.subcategoryId,
-    subName: listing.subcategory?.name,
-    country: listing.countryCode,
-    countryName: listing.country?.name,
-    city: listing.city,
-    location: `${listing.city}, ${listing.country?.name || ""}`,
-    storeAddress: listing.storeAddress,
-    specs: listing.specs,
-    photos: (listing.photos || [])
-      .sort((a, b) => a.position - b.position)
-      .map((p) => p.url),
-    sellerId: listing.sellerId,
-    status: listing.status,
-    featured: listing.featured,
-    views: listing.views,
-    postedAt: listing.createdAt,
-  };
-}
+const { LISTING_INCLUDE, toPublicListing } = require("../utils/listingFormatter");
 
 // ===== GET /api/sellers/:id - public seller profile =====
 // Mirrors listing.js's seller card (name, verified, memberSince, responseTime,
