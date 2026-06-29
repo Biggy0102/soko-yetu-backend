@@ -12,6 +12,7 @@ const referenceRoutes = require("./routes/referenceRoutes");
 const uploadRoutes = require("./routes/uploadRoutes");
 const sellerRoutes = require("./routes/sellerRoutes");
 const savedAdRoutes = require("./routes/savedAdRoutes");
+const engagementRoutes = require("./routes/engagementRoutes");
 const app = express();
 
 // Render (and most PaaS providers) terminate TLS at a proxy in front of the
@@ -43,6 +44,7 @@ app.get("/api/health", (req, res) => {
 
 app.use("/api/auth", authRoutes);
 app.use("/api/listings", listingRoutes);
+app.use("/api/listings", engagementRoutes); // offers/callbacks/reports - registered after listingRoutes so :id routes there match first
 app.use("/api", referenceRoutes); // exposes /api/categories and /api/countries
 app.use("/api/upload", uploadRoutes);
 app.use("/api/sellers", sellerRoutes);
