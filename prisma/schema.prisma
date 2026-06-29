@@ -295,6 +295,8 @@ model Message {
   sender          User         @relation("MessageSender", fields: [senderId], references: [id])
   text            String       @db.Text
   createdAt       DateTime     @default(now())
+  readAt          DateTime?    // null = unread. Set when the recipient (not the sender) views the conversation.
 
   @@map("messages")
+  @@index([conversationId, readAt]) // speeds up "unread count in this conversation" and "mark all as read"
 }
