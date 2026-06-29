@@ -46,6 +46,8 @@ model User {
   messagesSent  Message[]    @relation("MessageSender")
   conversationsAsBuyer  Conversation[] @relation("ConversationBuyer")
   conversationsAsSeller Conversation[] @relation("ConversationSeller")
+  feedbackReceived      Feedback[]     @relation("FeedbackForSeller")
+  feedbackGiven         Feedback[]     @relation("FeedbackByAuthor")
 
   @@map("users")
 }
@@ -245,6 +247,25 @@ model SavedAd {
   @@map("saved_ads")
 }
 
+// ===== SELLER FEEDBACK =====
+// Maps to listing.js's seller card (seller.feedbackCount) and the "Feedback" banner
+// link on listing.html. Any logged-in user can leave feedback on a seller - not
+// restricted to verified buyers, since Phase 1 has no purchase-confirmation flow yet.
+
+model Feedback {
+  id          Int      @id @default(autoincrement())
+  sellerId    Int
+  seller      User     @relation("FeedbackForSeller", fields: [sellerId], references: [id], onDelete: Cascade)
+  authorId    Int
+  author      User     @relation("FeedbackByAuthor", fields: [authorId], references: [id])
+  rating      Int      // 1-5 stars
+  comment     String?  @db.Text
+  createdAt   DateTime @default(now())
+
+  @@unique([sellerId, authorId]) // one feedback entry per author per seller - resubmitting updates it instead
+  @@map("feedback")
+  @@index([sellerId])
+}
 // ===== MESSAGING =====
 // Maps to listing.js's chat modal (openChatModal / sendChatMessage) -
 // currently in-memory only with fake auto-replies. One Conversation per
