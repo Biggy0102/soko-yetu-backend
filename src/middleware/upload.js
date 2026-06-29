@@ -1,24 +1,10 @@
-// Configures multer to accept image uploads for listings - saves files to
-// disk in the uploads/ folder and validates type/size before accepting them.
+﻿// Configures multer to accept image uploads for listings - validates type/size,
+// then hands the file to uploadController.js as an in-memory buffer (not saved
+// to disk) so it can be pushed straight to Cloudinary. Render's filesystem is
+// ephemeral - anything written to local disk here would vanish on the next
+// restart/redeploy/spin-down, which is exactly the bug this replaces.
 
 const multer = require("multer");
-const path = require("path");
-const crypto = require("crypto");
-
-const UPLOAD_DIR = path.join(__dirname, "..", "..", "uploads");
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, UPLOAD_DIR);
-  },
-  filename: (req, file, cb) => {
-    // Random filename instead of the original - avoids collisions and avoids
-    // trusting user-supplied filenames, which can contain path traversal tricks.
-    const ext = path.extname(file.originalname).toLowerCase();
-    const randomName = crypto.randomBytes(16).toString("hex");
-    cb(null, `${randomName}${ext}`);
-  },
-});
 
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 
@@ -31,7 +17,7 @@ function fileFilter(req, file, cb) {
 }
 
 const upload = multer({
-  storage,
+  storage: multer.memoryStorage(), // keeps the file in req.file(s).buffer instead of writing to disk
   fileFilter,
   limits: {
     fileSize: 5 * 1024 * 1024, // 5MB per photo - matches typical phone camera output without being excessive
@@ -39,4 +25,4 @@ const upload = multer({
   },
 });
 
-module.exports = { upload, UPLOAD_DIR };
+module.exports = { upload };

@@ -4,8 +4,6 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
-const path = require("path");
-
 const authRoutes = require("./routes/authRoutes");
 const listingRoutes = require("./routes/listingRoutes");
 const referenceRoutes = require("./routes/referenceRoutes");
@@ -34,10 +32,6 @@ app.use(
 );
 app.use(cors()); // tighten this to your real frontend's origin before going to production
 app.use(express.json());
-
-// Serves uploaded photos as plain static files, e.g.
-// https://soko-yetu-backend.onrender.com/uploads/abc123.jpg
-app.use("/uploads", express.static(path.join(__dirname, "..", "uploads")));
 
 app.get("/api/health", (req, res) => {
   res.json({ status: "ok" });
