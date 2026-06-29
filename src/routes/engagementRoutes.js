@@ -15,6 +15,7 @@ const {
   createReport,
 } = require("../controllers/engagementController");
 const { requireAuth, attachUserIfPresent } = require("../middleware/auth");
+const { startOrContinueConversation } = require("../controllers/messageController");
 
 // Offers - always require a logged-in buyer
 router.post("/:id/offers", requireAuth, createOffer);
@@ -25,6 +26,11 @@ router.post("/:id/callbacks", attachUserIfPresent, createCallback);
 router.get("/:id/callbacks", requireAuth, getCallbacksForListing);
 
 // Reports - guests allowed too, same reasoning as callbacks
+
 router.post("/:id/reports", attachUserIfPresent, createReport);
+
+// Messaging - starting a chat from a listing page requires a logged-in buyer,
+// same as offers (an anonymous chat thread wouldn't make sense to revisit later)
+router.post("/:id/messages", requireAuth, startOrContinueConversation);
 
 module.exports = router;
