@@ -13,6 +13,14 @@ const uploadRoutes = require("./routes/uploadRoutes");
 
 const app = express();
 
+// Render (and most PaaS providers) terminate TLS at a proxy in front of the
+// app, then forward requests internally over plain HTTP. Without this,
+// req.protocol always reports "http" - even when the original client request
+// was https - which is why uploadController.js was building http:// URLs.
+// trust proxy tells Express to read the real protocol from the
+// X-Forwarded-Proto header that Render's proxy sets.
+app.set("trust proxy", 1);
+
 app.use(
   helmet({
     // Default helmet blocks other origins from loading images/files from this
