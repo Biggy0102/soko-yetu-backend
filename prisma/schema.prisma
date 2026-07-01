@@ -1,4 +1,4 @@
-// ===== SOKO YETU - DATABASE SCHEMA =====
+﻿// ===== SOKO YETU - DATABASE SCHEMA =====
 // This schema is modeled directly on the frontend's existing data shapes:
 // js/data.js (CATEGORIES, COUNTRIES, LISTINGS, SELLERS), js/post-ad.js (ad creation),
 // js/dashboard.js ("my ads"), js/listing.js (offers/callbacks/reports/chat), js/auth.js (register/login).
@@ -29,6 +29,10 @@ model User {
   verified      Boolean   @default(false)
   memberSince   DateTime  @default(now())
   responseTime  String    @default("within a day") // e.g. "within an hour" - could become computed later
+
+  // Moderation - no signup flow sets this; grant it manually in the DB for
+  // trusted accounts only. Powers the admin listing-approval endpoints.
+  isAdmin       Boolean   @default(false)
 
   // Settings (settings.js notifications + privacy tabs)
   notifyEmail   Boolean   @default(true)
@@ -300,3 +304,4 @@ model Message {
   @@map("messages")
   @@index([conversationId, readAt]) // speeds up "unread count in this conversation" and "mark all as read"
 }
+

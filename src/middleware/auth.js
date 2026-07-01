@@ -1,8 +1,9 @@
-// Protects routes that require a logged-in user.
+﻿// Protects routes that require a logged-in user.
 // Reads the "Authorization: Bearer <token>" header, verifies it, and attaches
 // the decoded user info to req.user so later route handlers know who's asking.
 
 const { verifyToken } = require("../utils/jwt");
+const prisma = require("../prisma/client");
 
 function requireAuth(req, res, next) {
   const header = req.headers.authorization;
@@ -37,4 +38,19 @@ function attachUserIfPresent(req, res, next) {
   next();
 }
 
-module.exports = { requireAuth, attachUserIfPresent };
+// Gate for moderation endpoints. Must run after requireAuth (needs req.user.id).
+// The JWT payload only carries { id, phone } - isAdmin isn't in the token, so
+// we can't trust a client-supplied claim, and it also means the flag takes
+// effect immediately without waiting for the token to expire/refresh.
+async function requireAdmin(req, res, next) {
+  const user = await prisma.user.findUnique({ where: { id: req.user.id } });
+
+  if (!user || !user.isAdmin) {
+    return res.status(403).json({ error: "Admin access required." });
+  }
+
+  next();
+}
+
+module.exports = { requireAuth, attachUserIfPresent, requireAdmin };
+

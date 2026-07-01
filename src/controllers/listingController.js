@@ -1,4 +1,4 @@
-﻿// Implements the real version of what js/browse.js, js/listing.js, js/post-ad.js,
+﻿ï»¿// Implements the real version of what js/browse.js, js/listing.js, js/post-ad.js,
 // and js/dashboard.js currently fake using the hardcoded LISTINGS array and
 // sessionStorage. These endpoints read/write real listings in the database.
 
@@ -227,8 +227,18 @@ async function updateListing(req, res) {
   if (data.price !== undefined && Number(data.price) < 0) {
     return res.status(400).json({ error: "Price must be 0 or greater." });
   }
-  if (data.status !== undefined && !["pending", "active", "sold", "rejected"].includes(data.status)) {
-    return res.status(400).json({ error: "Invalid status." });
+
+  // Sellers may only toggle between "active" and "sold" on their own ad (the
+  // "Mark as sold" / "Relist" actions). They can never set "active" from
+  // "pending"/"rejected" themselves - that would let anyone skip moderation
+  // entirely. Only the admin endpoints (adminController.js) can do that.
+  if (data.status !== undefined) {
+    const allowedSelfTransitions = { active: "sold", sold: "active" };
+    if (allowedSelfTransitions[existing.status] !== data.status) {
+      return res.status(403).json({
+        error: "You can only mark an active ad as sold, or relist a sold ad.",
+      });
+    }
   }
 
   const listing = await prisma.listing.update({
@@ -291,3 +301,4 @@ module.exports = {
   getCategories,
   getCountries,
 };
+

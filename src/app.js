@@ -1,4 +1,4 @@
-// Main server entry point. Run with: node src/app.js (or npm run dev)
+﻿// Main server entry point. Run with: node src/app.js (or npm run dev)
 
 require("dotenv").config();
 const express = require("express");
@@ -12,6 +12,7 @@ const sellerRoutes = require("./routes/sellerRoutes");
 const savedAdRoutes = require("./routes/savedAdRoutes");
 const engagementRoutes = require("./routes/engagementRoutes");
 const conversationRoutes = require("./routes/conversationRoutes");
+const adminRoutes = require("./routes/adminRoutes");
 const app = express();
 
 // Render (and most PaaS providers) terminate TLS at a proxy in front of the
@@ -45,6 +46,7 @@ app.use("/api/upload", uploadRoutes);
 app.use("/api/sellers", sellerRoutes);
 app.use("/api/saved-ads", savedAdRoutes);
 app.use("/api/conversations", conversationRoutes);
+app.use("/api/admin", adminRoutes);
 
 // Catch-all error handler - keeps unexpected errors from leaking stack traces
 // to the client while still logging them for us to debug.
@@ -57,3 +59,4 @@ const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
   console.log(`Soko Yetu backend running on http://localhost:${PORT}`);
 });
+
