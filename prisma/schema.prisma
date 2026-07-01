@@ -1,4 +1,4 @@
-﻿// ===== SOKO YETU - DATABASE SCHEMA =====
+// ===== SOKO YETU - DATABASE SCHEMA =====
 // This schema is modeled directly on the frontend's existing data shapes:
 // js/data.js (CATEGORIES, COUNTRIES, LISTINGS, SELLERS), js/post-ad.js (ad creation),
 // js/dashboard.js ("my ads"), js/listing.js (offers/callbacks/reports/chat), js/auth.js (register/login).
