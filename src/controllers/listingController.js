@@ -1,4 +1,4 @@
-﻿ï»¿// Implements the real version of what js/browse.js, js/listing.js, js/post-ad.js,
+﻿// Implements the real version of what js/browse.js, js/listing.js, js/post-ad.js,
 // and js/dashboard.js currently fake using the hardcoded LISTINGS array and
 // sessionStorage. These endpoints read/write real listings in the database.
 
@@ -184,7 +184,7 @@ async function createListing(req, res) {
       storeAddress: storeAddress || null,
       specs: specs || {},
       sellerId: req.user.id,
-      status: "pending", // same as postAdState's default - awaits moderation before going live
+      status: "active", // same as postAdState's default - awaits moderation before going live
       photos: Array.isArray(photoUrls)
         ? { create: photoUrls.map((url, i) => ({ url, position: i })) }
         : undefined,
